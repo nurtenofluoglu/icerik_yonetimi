@@ -1,0 +1,21 @@
+{
+  "kind": "collectionType",
+  "collectionName": "mesajs",
+  "info": {
+    "singularName": "mesaj",
+    "pluralName": "mesajs",
+    "displayName": "Mesaj"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "isim": {
+      "type": "string"
+    },
+    "icerik": {
+      "type": "text"
+    }
+  }
+}
