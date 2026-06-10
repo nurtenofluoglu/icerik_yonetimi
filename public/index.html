@@ -291,7 +291,6 @@
 
         async function verileriGetir() {
             try {
-                // Strapi v4 ve v5 plural endpoint'leri kontrol ediliyor
                 let response = await fetch(`${STRAPI_URL}/api/bitkis?populate=*`);
                 if (!response.ok) response = await fetch(`${STRAPI_URL}/api/bitkiler?populate=*`);
                 const result = await response.json();
@@ -312,10 +311,8 @@
             let bulundu = false;
 
             tumBitkilerVerisi.forEach(bitki => {
-                // --- STRAPI V4 VE V5 VERİ MODELİ ÇÖZÜMLEME GÜVENCESİ ---
                 const veri = bitki.attributes ? bitki.attributes : bitki;
                 
-                // NURTEN ve Nurten isimlendirme çakışmalarını sıfırlıyoruz
                 const baslikMetniTr = veri.NURTEN || veri.Nurten || bitki.NURTEN || bitki.Nurten || 'Başlıksız Bitki';
                 const anahtarKelime = turkceKucukHarf(baslikMetniTr).trim();
                 
@@ -331,7 +328,6 @@
                     bulundu = true;
                     let faydalarHtml = '';
                     
-                    // Zengin metin yapısı (Blocks) için esnek okuma
                     const hamFaydalar = veri.faydalari || bitki.faydalari;
                     if (hamFaydalar && Array.isArray(hamFaydalar)) {
                         hamFaydalar.forEach(blok => {
@@ -349,7 +345,7 @@
                         sonFaydalar = bitkiCevirileri[anahtarKelime].faydalar;
                     }
 
-                    // Görsel yollarını v4/v5 formatına göre güvenli parse etme
+                    // --- 🔄 STRAPI V5 EN GÜVENLİ GÖRSEL ÇÖZÜMLEME SİSTEMİ ---
                     let gorselYolu = '';
                     const gorselObjesi = veri.GORSEL || bitki.GORSEL;
                     if (gorselObjesi) {
@@ -377,22 +373,14 @@
                         }
                     }
 
-                    // Dinamik yedek görsel algoritması
-                    let yedekResim = 'uploads/zerdecal.png';
-                    if (anahtarKelime.includes('ebegümeci') || anahtarKelime.includes('ebegumeci')) yedekResim = 'uploads/ebegumeci.png';
-                    else if (anahtarKelime.includes('kantaron') || anahtarKelime.includes('gümüşhane') || anahtarKelime.includes('şifalı')) yedekResim = 'uploads/sari_kantaron.jpg';
-                    else if (anahtarKelime.includes('dut') || anahtarKelime.includes('yaprağı')) yedekResim = 'uploads/dut_yapragi.png';
-                    else if (anahtarKelime.includes('domates') || anahtarKelime.includes('ağaç')) yedekResim = 'uploads/agac_domatesi.png';
-                    else if (anahtarKelime.includes('yarpuz') || anahtarKelime.includes('asırlık') || anahtarKelime.includes('ağrı')) yedekResim = 'uploads/yeni.jpg';
-                    else if (anahtarKelime.includes('öksü') || anahtarKelime.includes('otu') || anahtarKelime.includes('oksu')) yedekResim = 'uploads/oksu_otu.png';
-                    else if (anahtarKelime.includes('rezene')) yedekResim = 'uploads/rezene.png';
-                    else if (anahtarKelime.includes('papatya')) yedekResim = 'uploads/papatya.png';
+                    // İnternette kırılma ihtimaline karşı her durumda çalışan şık bir doğa görseli
+                    let internetYedekResmi = 'https://images.unsplash.com/photo-1515150144380-bca9f1650ed9?q=80&w=600';
 
                     const kart = document.createElement('div');
                     kart.className = 'bitki-kart';
                     kart.innerHTML = `
                         <div class="bitki-resim-kutusu">
-                            <img src="${tamGorselUrl || yedekResim}" alt="${sonBaslik}" onerror="this.onerror=null; this.src='${yedekResim}';">
+                            <img src="${tamGorselUrl || internetYedekResmi}" alt="${sonBaslik}" onerror="this.onerror=null; this.src='${internetYedekResmi}';">
                         </div>
                         <div class="bitki-icerik-kutusu">
                             <h3>${sonBaslik}</h3>
