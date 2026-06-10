@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doğanın Kalbi | Makfaliguri</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f5; color: #2c3e50; line-height: 1.6; }
+
+        /* --- GİRİŞ EKRANI ARKA PLAN RESMİ --- */
+        .hero-section {
+            height: 100vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.45)), url('makfaliguri-logo.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        /* --- SAĞ ÜST MENÜ VE ARAMA ÇUBUĞU --- */
+        .ust-menu { 
+            position: absolute; 
+            top: 40px; 
+            right: 5%; 
+            display: flex; 
+            align-items: center; 
+            gap: 20px; 
+            z-index: 10; 
+        }
+        
+        .ust-menu a { 
+            color: white; 
+            text-decoration: none; 
+            font-size: 1.05rem; 
+            font-weight: 500; 
+            text-shadow: 0 2px 8px rgba(0,0,0,0.6); 
+            cursor: pointer; 
+            transition: opacity 0.2s;
+        }
+        .ust-menu a:hover { opacity: 0.8; }
+
+        /* --- DİL DEĞİŞTİRME BUTONU --- */
+        .dil-secici {
+            background: #2e7d32;
+            color: white;
+            border: 1px solid rgba(255,255,255,0.4);
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        .dil-secici:hover { background: #1e3f20; }
+
+        .arama-kutusu { 
+            display: flex; 
+            align-items: center; 
+            background: rgba(255, 255, 255, 0.2); 
+            border: 1px solid rgba(255, 255, 255, 0.4); 
+            border-radius: 4px; 
+            backdrop-filter: blur(8px); 
+            padding-right: 12px; 
+        }
+        .arama-kutusu input { 
+            background: transparent; 
+            border: none; 
+            padding: 10px 10px 10px 15px; 
+            color: white; 
+            outline: none; 
+            width: 180px; 
+            font-size: 0.95rem; 
+        }
+        .arama-kutusu input::placeholder { color: rgba(255, 255, 255, 0.75); }
+        .arama-butonu { background: none; border: none; color: white; font-size: 1rem; cursor: pointer; }
+
+        .karsilama-alani { max-width: 800px; margin-top: 50px; }
+        .karsilama-alani h1 { font-size: 4.5rem; font-weight: 600; margin-bottom: 15px; text-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+        .karsilama-alani p { font-size: 1.4rem; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+
+        /* --- ORTAK İÇERİK SAYFALARI TASARIMI --- */
+        .icerik-alani { 
+            display: none; 
+            max-width: 900px; 
+            margin: 0 auto; 
+            padding: 60px 20px; 
+        }
+        .bolum-basligi { color: #1e3f20; font-size: 2.4rem; margin-bottom: 20px; border-bottom: 2px solid #2e7d32; padding-bottom: 10px; }
+        
+        .bilgi-kart-tasarim {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border: 1px solid #eef2f0;
+            font-size: 1.1rem;
+            color: #34495e;
+            position: relative;
+        }
+
+        .mesaj-formu { margin-top: 30px; display: flex; flex-direction: column; gap: 15px; border-top: 1px solid #eef2f0; padding-top: 25px; }
+        .mesaj-formu input, .mesaj-formu textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 1rem; font-family: inherit; outline: none; }
+        .gonder-btn { background: #2e7d32; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1.05rem; transition: background 0.2s; }
+        .gonder-btn:hover { background: #1e3f20; }
+
+        .bitki-kart { background: white; padding: 35px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.03); margin-bottom: 40px; display: flex; gap: 40px; align-items: center; border: 1px solid #eef2f0; position: relative; }
+        .bitki-resim-kutusu { flex: 1; min-width: 340px; }
+        .bitki-kart img { width: 100%; height: 280px; object-fit: cover; border-radius: 8px; display: block; }
+        .bitki-icerik-kutusu { flex: 1.5; padding-bottom: 30px; }
+        .bitki-icerik-kutusu h3 { color: #2e7d32; font-size: 2.1rem; margin-bottom: 12px; text-transform: capitalize; }
+        .faydalar-alani { color: #4a554e; font-size: 1.05rem; text-align: justify; }
+
+        .kart-anasayfa-btn { display: inline-block; margin-top: 25px; color: #2e7d32; text-decoration: none; font-size: 0.95rem; font-weight: 600; cursor: pointer; background: rgba(46, 125, 50, 0.05); padding: 8px 18px; border-radius: 20px; border: 1px solid rgba(46, 125, 50, 0.15); }
+    </style>
+</head>
+<body>
+
+    <div id="anaGirisEkrani" class="hero-section">
+        <div class="ust-menu">
+            <a onclick="sayfaGoster('hakkimizda-bolumu')" id="linkHakkimizda">Hakkımızda</a>
+            <a onclick="sayfaGoster('iletisim-bolumu')" id="linkIletisim">İletişim</a>
+            
+            <button class="dil-secici" onclick="dilDegistir()" id="dilBtn">Language: EN</button>
+
+            <div class="arama-kutusu">
+                <input type="text" id="siteArama" onkeyup="if(event.key === 'Enter') aramaYap()" placeholder="Bitki adı ara...">
+                <button class="arama-butonu" onclick="aramaYap()">🔍</button>
+            </div>
+        </div>
+        <div class="karsilama-alani">
+            <h1 id="anaBaslik">🌿 Doğan'ın Kalbi</h1>
+            <p id="anaAltBaslik">Şifalı bitkilerin özünü ve gizli dünyasını keşfedin.</p>
+        </div>
+    </div>
+
+    <div id="rehber-bolumu" class="icerik-alani">
+        <h2 class="bolum-basligi" id="sonucBasligi">Arama Sonuçları</h2>
+        <div id="bitki-listesi">Veriler yükleniyor...</div>
+    </div>
+
+    <div id="hakkimizda-bolumu" class="icerik-alani">
+        <h2 class="bolum-basligi" id="hakkimizdaBaslik">Hakkımızda</h2>
+        <div class="bilgi-kart-tasarim">
+            <p style="margin-bottom: 15px;" id="hakkimizdaMetin1"><strong>Doğan'ın Kalbi</strong>, doğanın bizlerine sunduğu eşsiz şifaları, nesilden nesile aktarılan bitki bilgilerini modern dünyayla buluşturmak amacıyla kurulmuş dijital bir rehberdir.</p>
+            <p id="hakkimizdaMetin2">Amacımız, toprağın derinliklerinden gelen bu kadim şifayı, bitkilerin faydalarını ve doğru kullanım yöntemlerini en yalın haliyle sizlere sunmaktır. Doğaya kulak verin, çünkü doğa asla yalan söylemez.</p>
+            <br>
+            <a class="kart-anasayfa-btn" onclick="anaSayfayaDon()" id="btnGeri1">← Ana Sayfaya Dön</a>
+        </div>
+    </div>
+
+    <div id="iletisim-bolumu" class="icerik-alani">
+        <h2 class="bolum-basligi" id="iletisimBaslik">İletişim</h2>
+        <div class="bilgi-kart-tasarim">
+            <div style="margin-bottom: 20px;">
+                <p style="margin-bottom: 10px;" id="iletisimMetin1">Bizimle paylaşmak istediğiniz bir bitki hikayesi, öneri veya sorunuz mu var? Doğanın sesine ortak olmak için aşağıdaki kanallardan bize ulaşabilirsiniz:</p>
+                <p>📍 <strong id="lblAdres">Adres:</strong> Rize, Türkiye</p>
+                <p>📧 <strong>E-Posta:</strong> info@makfaliguri.com</p>
+                <p>📞 <strong id="lblTelefon">Telefon:</strong> +90 (555) 000 00 00</p>
+            </div>
+            
+            <form class="mesaj-formu" id="iletisimFormu" onsubmit="mesajGonder(event)">
+                <p style="font-size: 1rem; color: #555;" id="iletisimFormMetin">Dilerseniz aşağıdaki formu doldurarak da doğrudan bize mesaj bırakabilirsiniz:</p>
+                <input type="text" id="ziyaretciIsim" placeholder="Adınız Soyadınız" required>
+                <textarea id="ziyaretciMesaj" rows="4" placeholder="Mesajınız..." required></textarea>
+                <button type="submit" class="gonder-btn" id="btnFormGonder">Mesajı Gönder (API)</button>
+            </form>
+            <br>
+            <a class="kart-anasayfa-btn" onclick="anaSayfayaDon()" id="btnGeri2">← Ana Sayfaya Dön</a>
+        </div>
+    </div>
+
+    <script>
+        const STRAPI_URL = 'https://icerik-yonetimi.onrender.com';
+        let tumBitkilerVerisi = []; 
+        let mevcutDil = 'TR'; // Varsayılan dil Türkçe
+
+        // --- 🌍 ÇEVİRİ SÖZLÜĞÜ (SABİT METİNLER) ---
+        const diller = {
+            TR: {
+                linkHakkimizda: "Hakkımızda", linkIletisim: "İletişim", dilBtn: "Language: EN",
+                anaBaslik: "🌿 Doğan'ın Kalbi", anaAltBaslik: "Şifalı bitkilerin özünü ve gizli dünyasını keşfedin.",
+                sonucBasligi: "Arama Sonuçları", hakkimizdaBaslik: "Hakkımızda",
+                hakkimizdaMetin1: "<strong>Doğan'ın Kalbi</strong>, doğanın bizlerine sunduğu eşsiz şifaları, nesilden nesile aktarılan bitki bilgilerini modern dünyayla buluşturmak amacıyla kurulmuş dijital bir rehberdir.",
+                hakkimizdaMetin2: "Amacımız, toprağın derinliklerinden gelen bu kadim şifayı, bitkilerin faydalarını ve doğru kullanım yöntemlerini en yalın haliyle sizlere sunmaktır. Doğaya kulak verin, çünkü doğa asla yalan söylemez.",
+                btnGeri1: "← Ana Sayfaya Dön", btnGeri2: "← Ana Sayfaya Dön", btnKartGeri: "← Geri Dön",
+                iletisimBaslik: "İletişim", iletisimMetin1: "Bizimle paylaşmak istediğiniz bir bitki hikayesi, öneri veya sorunuz mu var? Doğanın sesine ortak olmak için aşağıdaki kanallardan bize ulaşabilirsiniz:",
+                lblAdres: "Adres:", lblTelefon: "Telefon:", iletisimFormMetin: "Dilerseniz aşağıdaki formu doldurarak da doğrudan bize mesaj bırakabilirsiniz:",
+                placeholderAra: "Bitki adı ara...", placeholderIsim: "Adınız Soyadınız", placeholderMesaj: "Mesajınız...", btnFormGonder: "Mesajı Gönder (API)",
+                bulunamadi: "Bitki bulunamadı.", yukleniyor: "Veriler yükleniyor...", aciklamaYok: "Açıklama yok."
+            },
+            EN: {
+                linkHakkimizda: "About Us", linkIletisim: "Contact", dilBtn: "Language: TR",
+                anaBaslik: "🌿 Heart of Nature", anaAltBaslik: "Discover the essence and hidden world of medicinal plants.",
+                sonucBasligi: "Search Results", hakkimizdaBaslik: "About Us",
+                hakkimizdaMetin1: "<strong>Heart of Nature</strong> is a digital guide established to bring the unique remedies offered by nature and plant knowledge passed down through generations together with the modern world.",
+                hakkimizdaMetin2: "Our goal is to present this ancient healing coming from the depths of the soil, the benefits of plants, and their correct usage in the simplest way. Listen to nature, because nature never lies.",
+                btnGeri1: "← Back to Homepage", btnGeri2: "← Back to Homepage", btnKartGeri: "← Back",
+                iletisimBaslik: "Contact", iletisimMetin1: "Do you have a plant story, suggestion, or question to share with us? You can contact us through the channels below to join the voice of nature:",
+                lblAdres: "Address:", lblTelefon: "Phone:", iletisimFormMetin: "If you wish, you can also leave a message directly by filling out the form below:",
+                placeholderAra: "Search plant name...", placeholderIsim: "Your Name & Surname", placeholderMesaj: "Your Message...", btnFormGonder: "Send Message (API)",
+                bulunamadi: "Plant not found.", yukleniyor: "Loading data...", aciklamaYok: "No description available."
+            }
+        };
+
+        // --- 🌿 ENTEGRE BİTKİ ÇEVİRİLERİ (İNGİLİZCE) ---
+        const bitkiCevirileri = {
+            "agac domatesi": {
+                baslik: "Tree Tomato (Tamarillo)",
+                faydalar: "<p>It strengthens the immune system thanks to its high vitamin C content.</p><p>It regulates blood pressure and supports heart health with its potassium minerals.</p><p>It contains powerful antioxidants that protect eye health.</p>"
+            },
+            "ebegümeci": {
+                baslik: "Mallow",
+                faydalar: "<p>It soothes respiratory tract irritation and relieves coughs.</p><p>It reduces stomach acidity and protects the digestive system.</p><p>When applied externally, it reduces skin inflammation and heals wounds faster.</p>"
+            },
+            "dut yaprağı": {
+                baslik: "Mulberry Leaf",
+                faydalar: "<p>It helps balance blood sugar levels, making it beneficial for diabetics.</p><p>It clears toxins from the body with its powerful diuretic properties.</p><p>It lowers bad cholesterol and reduces the risk of vascular occlusion.</p>"
+            },
+            "gümüşhane şifalı": {
+                baslik: "St. John's Wort (Gümüşhane)",
+                faydalar: "<p>It is traditionally used to treat mild to moderate depression and anxiety.</p><p>St. John's Wort oil accelerates cell regeneration in skin burns and scars.</p><p>It regulates the digestive tract and reduces stomach cramps.</p>"
+            },
+            "ağrı'da asırlık": {
+                baslik: "Pennyroyal (Yarpuz Otu - Ağrı)",
+                faydalar: "<p>It cleanses the respiratory tract with its intense minty aroma and relaxes the lungs.</p><p>It relieves digestive complaints such as bloating and gas.</p><p>It regulates the menstrual cycle and reduces menstrual pains.</p>"
+            }
+        };
+
+        function dilArayuzunuGuncelle() {
+            const d = diller[mevcutDil];
+            document.getElementById('linkHakkimizda').innerText = d.linkHakkimizda;
+            document.getElementById('linkIletisim').innerText = d.linkIletisim;
+            document.getElementById('dilBtn').innerText = d.dilBtn;
+            document.getElementById('anaBaslik').innerText = d.anaBaslik;
+            document.getElementById('anaAltBaslik').innerText = d.anaAltBaslik;
+            document.getElementById('sonucBasligi').innerText = d.sonucBasligi;
+            document.getElementById('hakkimizdaBaslik').innerText = d.hakkimizdaBaslik;
+            document.getElementById('hakkimizdaMetin1').innerHTML = d.hakkimizdaMetin1;
+            document.getElementById('hakkimizdaMetin2').innerText = d.hakkimizdaMetin2;
+            document.getElementById('btnGeri1').innerText = d.btnGeri1;
+            document.getElementById('btnGeri2').innerText = d.btnGeri2;
+            document.getElementById('iletisimBaslik').innerText = d.iletisimBaslik;
+            document.getElementById('iletisimMetin1').innerText = d.iletisimMetin1;
+            document.getElementById('lblAdres').innerText = d.lblAdres;
+            document.getElementById('lblTelefon').innerText = d.lblTelefon;
+            document.getElementById('iletisimFormMetin').innerText = d.iletisimFormMetin;
+            document.getElementById('siteArama').placeholder = d.placeholderAra;
+            document.getElementById('ziyaretciIsim').placeholder = d.placeholderIsim;
+            document.getElementById('ziyaretciMesaj').placeholder = d.placeholderMesaj;
+            document.getElementById('btnFormGonder').innerText = d.btnFormGonder;
+        }
+
+        function dilDegistir() {
+            mevcutDil = (mevcutDil === 'TR') ? 'EN' : 'TR';
+            dilArayuzunuGuncelle();
+            if (document.getElementById('rehber-bolumu').style.display === 'block') {
+                aramaYap();
+            }
+        }
+
+        function sayfaGoster(sayfaId) {
+            document.getElementById('anaGirisEkrani').style.display = 'none';
+            document.getElementById('rehber-bolumu').style.display = 'none';
+            document.getElementById('hakkimizda-bolumu').style.display = 'none';
+            document.getElementById('iletisim-bolumu').style.display = 'none';
+            document.getElementById(sayfaId).style.display = 'block';
+        }
+
+        function anaSayfayaDon() {
+            document.getElementById('siteArama').value = '';
+            document.getElementById('rehber-bolumu').style.display = 'none';
+            document.getElementById('hakkimizda-bolumu').style.display = 'none';
+            document.getElementById('iletisim-bolumu').style.display = 'none';
+            document.getElementById('anaGirisEkrani').style.display = 'flex';
+        }
+
+        function turkceKucukHarf(str) {
+            if(!str) return "";
+            return str.replace(/İ/g, "i").replace(/I/g, "ı").replace(/Ş/g, "ş").replace(/Ğ/g, "ğ").replace(/Ç/g, "ç").replace(/Ü/g, "ü").replace(/Ö/g, "ö").toLowerCase();
+        }
+
+        async function verileriGetir() {
+            try {
+                // Strapi v4 ve v5 plural endpoint'leri kontrol ediliyor
+                let response = await fetch(`${STRAPI_URL}/api/bitkis?populate=*`);
+                if (!response.ok) response = await fetch(`${STRAPI_URL}/api/bitkiler?populate=*`);
+                const result = await response.json();
+
+                if (result.data && result.data.length > 0) {
+                    tumBitkilerVerisi = result.data; 
+                    console.log("Veriler başarıyla hafızaya alındı. Toplam Öğe:", tumBitkilerVerisi.length);
+                }
+            } catch (e) { console.error("Veri çekme hatası:", e); }
+        }
+
+        function aramaYap() {
+            let input = turkceKucukHarf(document.getElementById('siteArama').value.trim());
+            if(input === "") return;
+            
+            const listeDiv = document.getElementById('bitki-listesi');
+            listeDiv.innerHTML = ''; 
+            let bulundu = false;
+
+            tumBitkilerVerisi.forEach(bitki => {
+                // --- STRAPI V4 VE V5 VERİ MODELİ ÇÖZÜMLEME GÜVENCESİ ---
+                const veri = bitki.attributes ? bitki.attributes : bitki;
+                
+                // NURTEN ve Nurten isimlendirme çakışmalarını sıfırlıyoruz
+                const baslikMetniTr = veri.NURTEN || veri.Nurten || bitki.NURTEN || bitki.Nurten || 'Başlıksız Bitki';
+                const anahtarKelime = turkceKucukHarf(baslikMetniTr).trim();
+                
+                let eslesmeVar = anahtarKelime.includes(input);
+                
+                if (mevcutDil === 'EN' && bitkiCevirileri[anahtarKelime]) {
+                    if (turkceKucukHarf(bitkiCevirileri[anahtarKelime].baslik).includes(input)) {
+                        eslesmeVar = true;
+                    }
+                }
+
+                if (eslesmeVar) {
+                    bulundu = true;
+                    let faydalarHtml = '';
+                    
+                    // Zengin metin yapısı (Blocks) için esnek okuma
+                    const hamFaydalar = veri.faydalari || bitki.faydalari;
+                    if (hamFaydalar && Array.isArray(hamFaydalar)) {
+                        hamFaydalar.forEach(blok => {
+                            if (blok.type === 'paragraph' && blok.children) {
+                                faydalarHtml += `<p>${blok.children.map(c => c.text || '').join('')}</p>`;
+                            }
+                        });
+                    }
+
+                    let sonBaslik = baslikMetniTr;
+                    let sonFaydalar = faydalarHtml || `<p>${diller[mevcutDil].aciklamaYok}</p>`;
+
+                    if (mevcutDil === 'EN' && bitkiCevirileri[anahtarKelime]) {
+                        sonBaslik = bitkiCevirileri[anahtarKelime].baslik;
+                        sonFaydalar = bitkiCevirileri[anahtarKelime].faydalar;
+                    }
+
+                    // Görsel yollarını v4/v5 formatına göre güvenli parse etme
+                    let gorselYolu = '';
+                    const gorselObjesi = veri.GORSEL || bitki.GORSEL;
+                    if (gorselObjesi) {
+                        if (Array.isArray(gorselObjesi) && gorselObjesi[0]) {
+                            gorselYolu = gorselObjesi[0].url;
+                        } else if (gorselObjesi.data) {
+                            if (Array.isArray(gorselObjesi.data) && gorselObjesi.data[0]) {
+                                gorselYolu = gorselObjesi.data[0].url || gorselObjesi.data[0].attributes?.url;
+                            } else if (gorselObjesi.data.attributes) {
+                                gorselYolu = gorselObjesi.data.attributes.url;
+                            } else if (gorselObjesi.data.url) {
+                                gorselYolu = gorselObjesi.data.url;
+                            }
+                        } else if (gorselObjesi.url) {
+                            gorselYolu = gorselObjesi.url;
+                        }
+                    }
+
+                    let tamGorselUrl = '';
+                    if (gorselYolu) {
+                        if (gorselYolu.startsWith('http')) {
+                            tamGorselUrl = gorselYolu;
+                        } else {
+                            tamGorselUrl = gorselYolu.startsWith('/') ? `${STRAPI_URL}${gorselYolu}` : `${STRAPI_URL}/${gorselYolu}`;
+                        }
+                    }
+
+                    // Dinamik yedek görsel algoritması
+                    let yedekResim = 'uploads/zerdecal.png';
+                    if (anahtarKelime.includes('ebegümeci') || anahtarKelime.includes('ebegumeci')) yedekResim = 'uploads/ebegumeci.png';
+                    else if (anahtarKelime.includes('kantaron') || anahtarKelime.includes('gümüşhane') || anahtarKelime.includes('şifalı')) yedekResim = 'uploads/sari_kantaron.jpg';
+                    else if (anahtarKelime.includes('dut') || anahtarKelime.includes('yaprağı')) yedekResim = 'uploads/dut_yapragi.png';
+                    else if (anahtarKelime.includes('domates') || anahtarKelime.includes('ağaç')) yedekResim = 'uploads/agac_domatesi.png';
+                    else if (anahtarKelime.includes('yarpuz') || anahtarKelime.includes('asırlık') || anahtarKelime.includes('ağrı')) yedekResim = 'uploads/yeni.jpg';
+                    else if (anahtarKelime.includes('öksü') || anahtarKelime.includes('otu') || anahtarKelime.includes('oksu')) yedekResim = 'uploads/oksu_otu.png';
+                    else if (anahtarKelime.includes('rezene')) yedekResim = 'uploads/rezene.png';
+                    else if (anahtarKelime.includes('papatya')) yedekResim = 'uploads/papatya.png';
+
+                    const kart = document.createElement('div');
+                    kart.className = 'bitki-kart';
+                    kart.innerHTML = `
+                        <div class="bitki-resim-kutusu">
+                            <img src="${tamGorselUrl || yedekResim}" alt="${sonBaslik}" onerror="this.onerror=null; this.src='${yedekResim}';">
+                        </div>
+                        <div class="bitki-icerik-kutusu">
+                            <h3>${sonBaslik}</h3>
+                            <div class="faydalar-alani">${sonFaydalar}</div>
+                            <a class="kart-anasayfa-btn" onclick="anaSayfayaDon()">${diller[mevcutDil].btnKartGeri}</a>
+                        </div>
+                    `;
+                    listeDiv.appendChild(kart);
+                }
+            });
+
+            sayfaGoster('rehber-bolumu');
+            if(!bulundu) {
+                listeDiv.innerHTML = `<p style="text-align:center; padding:40px;">${diller[mevcutDil].bulunamadi} <a onclick="anaSayfayaDon()" style="color:#2e7d32; cursor:pointer; font-weight:bold;">${diller[mevcutDil].btnKartGeri}</a></p>`;
+            }
+        }
+
+        async function mesajGonder(event) {
+            event.preventDefault();
+            const isim = document.getElementById('ziyaretciIsim').value;
+            const icerik = document.getElementById('ziyaretciMesaj').value;
+            const paket = { data: { isim: isim, icerik: icerik } };
+            try {
+                const response = await fetch(`${STRAPI_URL}/api/mesajs`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(paket)
+                });
+                if (response.ok) {
+                    alert(mevcutDil === 'TR' ? 'Harika! Mesajınız Strapi veritabanına başarıyla eklendi.' : 'Great! Your message has been successfully added to the Strapi database.');
+                    document.getElementById('iletisimFormu').reset();
+                } else {
+                    alert('Strapi API Error!');
+                }
+            } catch (error) {
+                console.error('Hata:', error);
+                alert('Connection Error!');
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            await verileriGetir();
+            dilArayuzunuGuncelle();
+        });
+    </script>
+</body>
+</html>
