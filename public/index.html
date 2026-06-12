@@ -128,7 +128,7 @@
     <div id="anaGirisEkrani" class="hero-section">
         <div class="ust-menu">
             <a onclick="sayfaGoster('hakkimizda-bolumu')" id="linkHakkimizda">Hakkımızda</a>
-            <a onclick="sayfaGoster('iletisim-bolumu')" id="linkIletisim">İletişim</a>
+            <a onclick="sayfaGoster('letisim-bolumu')" id="linkIletisim">İletişim</a>
             
             <button class="dil-secici" onclick="dilDegistir()" id="dilBtn">Language: EN</button>
 
@@ -261,7 +261,7 @@
         }
 
         function dilDegistir() {
-            currentLang = mevcutDil; // Eski global tanım bağımlılığı kontrolü için stabil tutuldu
+            currentLang = mevcutDil; 
             mevcutDil = (mevcutDil === 'TR') ? 'EN' : 'TR';
             dilArayuzunuGuncelle();
             if (document.getElementById('rehber-bolumu').style.display === 'block') {
@@ -334,12 +334,21 @@
                 }
                 const anahtarKelimeAciklama = turkceKucukHarf(aciklamaMetniTr).trim();
                 
-                // 3. ÇİFT YÖNLÜ ESNEK ARAMA KONTROLÜ (Başlıkta VEYA Açıklamada geçiyorsa)
-                let eslesmeVar = anahtarKelimeBaslik.includes(input) || anahtarKelimeAciklama.includes(input);
+                // 3. ÇİFT YÖNLÜ ESNEK ARAMA VE SİHİRLİ KURAL KONTROLÜ
+                let eslesmeVar = false;
+
+                // Eğer kullanıcı "şifalı bitkiler" veya "sifali bitkiler" yazdıysa hepsini ekrana bas
+                if (input === "sifali bitkiler" || input === "şifalı bitkiler") {
+                    eslesmeVar = true;
+                } else {
+                    // Normal arama motoru mantığı (Başlıkta veya açıklamada geçiyorsa)
+                    eslesmeVar = anahtarKelimeBaslik.includes(input) || anahtarKelimeAciklama.includes(input);
+                }
                 
                 // İngilizce dil desteği araması için kontrol
                 if (mevcutDil === 'EN' && bitkiCevirileri[anahtarKelimeBaslik]) {
-                    if (turkceKucukHarf(bitkiCevirileri[anahtarKelimeBaslik].baslik).includes(input)) {
+                    // İngilizce modda "medicinal plants" yazılırsa veya normal İngilizce başlık aranırsa
+                    if (input === "medicinal plants" || turkceKucukHarf(bitkiCevirileri[anahtarKelimeBaslik].baslik).includes(input)) {
                         eslesmeVar = true;
                     }
                 }
@@ -356,7 +365,7 @@
                         sonFaydalar = bitkiCevirileri[anahtarKelimeBaslik].faydalar;
                     }
 
-                    // --- 🔄 STRAPI V5 GÖRSEL SİSTEMİ ---
+                    // --- 🔄 STRAPI VNG GÖRSEL SİSTEMİ ---
                     let gorselYolu = '';
                     const gorselObjesi = veri.GORSEL || bitki.GORSEL;
                     if (gorselObjesi) {
