@@ -261,6 +261,7 @@
         }
 
         function dilDegistir() {
+            currentLang = mevcutDil; // Eski global tanım bağımlılığı kontrolü için stabil tutuldu
             mevcutDil = (mevcutDil === 'TR') ? 'EN' : 'TR';
             dilArayuzunuGuncelle();
             if (document.getElementById('rehber-bolumu').style.display === 'block') {
@@ -313,39 +314,49 @@
             tumBitkilerVerisi.forEach(bitki => {
                 const veri = bitki.attributes ? bitki.attributes : bitki;
                 
+                // 1. BAŞLIK METNİNİ AL
                 const baslikMetniTr = veri.NURTEN || veri.Nurten || bitki.NURTEN || bitki.Nurten || 'Başlıksız Bitki';
-                const anahtarKelime = turkceKucukHarf(baslikMetniTr).trim();
+                const anahtarKelimeBaslik = turkceKucukHarf(baslikMetniTr).trim();
                 
-                let eslesmeVar = anahtarKelime.includes(input);
+                // 2. AÇIKLAMA (FAYDALARI) METNİNİ ÇÖZ VE BİRLEŞTİR
+                let aciklamaMetniTr = "";
+                let faydalarHtml = '';
+                const hamFaydalar = veri.faydalari || bitki.faydalari;
                 
-                if (mevcutDil === 'EN' && bitkiCevirileri[anahtarKelime]) {
-                    if (turkceKucukHarf(bitkiCevirileri[anahtarKelime].baslik).includes(input)) {
+                if (hamFaydalar && Array.isArray(hamFaydalar)) {
+                    hamFaydalar.forEach(blok => {
+                        if (blok.type === 'paragraph' && blok.children) {
+                            let paragrafMetni = blok.children.map(c => c.text || '').join('');
+                            aciklamaMetniTr += " " + paragrafMetni;
+                            faydalarHtml += `<p>${paragrafMetni}</p>`;
+                        }
+                    });
+                }
+                const anahtarKelimeAciklama = turkceKucukHarf(aciklamaMetniTr).trim();
+                
+                // 3. ÇİFT YÖNLÜ ESNEK ARAMA KONTROLÜ (Başlıkta VEYA Açıklamada geçiyorsa)
+                let eslesmeVar = anahtarKelimeBaslik.includes(input) || anahtarKelimeAciklama.includes(input);
+                
+                // İngilizce dil desteği araması için kontrol
+                if (mevcutDil === 'EN' && bitkiCevirileri[anahtarKelimeBaslik]) {
+                    if (turkceKucukHarf(bitkiCevirileri[anahtarKelimeBaslik].baslik).includes(input)) {
                         eslesmeVar = true;
                     }
                 }
 
+                // Eğer eşleşme sağlandıysa ilgili bitki kartını oluştur ve ekle
                 if (eslesmeVar) {
                     bulundu = true;
-                    let faydalarHtml = '';
-                    
-                    const hamFaydalar = veri.faydalari || bitki.faydalari;
-                    if (hamFaydalar && Array.isArray(hamFaydalar)) {
-                        hamFaydalar.forEach(blok => {
-                            if (blok.type === 'paragraph' && blok.children) {
-                                faydalarHtml += `<p>${blok.children.map(c => c.text || '').join('')}</p>`;
-                            }
-                        });
-                    }
 
                     let sonBaslik = baslikMetniTr;
                     let sonFaydalar = faydalarHtml || `<p>${diller[mevcutDil].aciklamaYok}</p>`;
 
-                    if (mevcutDil === 'EN' && bitkiCevirileri[anahtarKelime]) {
-                        sonBaslik = bitkiCevirileri[anahtarKelime].baslik;
-                        sonFaydalar = bitkiCevirileri[anahtarKelime].faydalar;
+                    if (mevcutDil === 'EN' && bitkiCevirileri[anahtarKelimeBaslik]) {
+                        sonBaslik = bitkiCevirileri[anahtarKelimeBaslik].baslik;
+                        sonFaydalar = bitkiCevirileri[anahtarKelimeBaslik].faydalar;
                     }
 
-                    // --- 🔄 STRAPI V5 EN GÜVENLİ GÖRSEL ÇÖZÜMLEME SİSTEMİ ---
+                    // --- 🔄 STRAPI V5 GÖRSEL SİSTEMİ ---
                     let gorselYolu = '';
                     const gorselObjesi = veri.GORSEL || bitki.GORSEL;
                     if (gorselObjesi) {
@@ -373,7 +384,6 @@
                         }
                     }
 
-                    // İnternette kırılma ihtimaline karşı her durumda çalışan şık bir doğa görseli
                     let internetYedekResmi = 'https://images.unsplash.com/photo-1515150144380-bca9f1650ed9?q=80&w=600';
 
                     const kart = document.createElement('div');
